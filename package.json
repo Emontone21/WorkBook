@@ -1,0 +1,12 @@
+{
+  "name": "workbook",
+  "version": "1.0.0",
+  "description": "Workbook - Daily workload manager for helpdesk workers",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^29.0.0"
+  }
+}

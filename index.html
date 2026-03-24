@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Workbook</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="14" cy="14" r="13" stroke="#4f8ef7" stroke-width="2"/>
+          <path d="M9 14l3.5 3.5L19 10" stroke="#4f8ef7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="logo-text">Work<br><strong>book</strong></span>
+      </div>
+      <nav class="sidebar-nav">
+        <button class="nav-item active" data-section="tasks" id="nav-tasks">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          <span>Tareas Pendientes</span>
+          <span class="badge" id="task-badge">0</span>
+        </button>
+        <button class="nav-item" data-section="emails" id="nav-emails">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <span>Correos Pendientes</span>
+          <span class="badge" id="email-badge">0</span>
+        </button>
+        <button class="nav-item" data-section="pomodoro" id="nav-pomodoro">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span>Temporizador Pomodoro</span>
+        </button>
+        <button class="nav-item" data-section="notes" id="nav-notes">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          <span>Notas Rápidas</span>
+        </button>
+      </nav>
+      <div class="sidebar-footer">
+        <span>v1.0.0</span>
+      </div>
+    </aside>
+
+    <!-- Main content -->
+    <main class="main-content">
+      <!-- Top bar -->
+      <header class="top-bar">
+        <div class="top-bar-left">
+          <h1 class="section-title" id="section-title">Tareas Pendientes</h1>
+        </div>
+        <div class="top-bar-right">
+          <span class="clock-date" id="clock-date"></span>
+          <span class="clock-time" id="clock-time"></span>
+          <button class="theme-toggle" id="theme-toggle-btn" title="Cambiar tema">
+            <span class="theme-toggle-icon" id="theme-toggle-icon">🌙</span>
+            <span id="theme-toggle-label">Oscuro</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Sections -->
+      <div class="sections-wrapper">
+
+        <!-- ===================== TASKS SECTION ===================== -->
+        <section class="section active" id="section-tasks">
+          <div class="section-inner">
+            <div class="card add-card">
+              <h2 class="card-title">Nueva Tarea</h2>
+              <div class="form-row">
+                <input type="text" id="task-input" class="text-input" placeholder="Descripción de la tarea…" />
+                <select id="task-priority" class="select-input">
+                  <option value="high">🔴 Alta</option>
+                  <option value="medium" selected>🟡 Media</option>
+                  <option value="low">🟢 Baja</option>
+                </select>
+                <button class="btn btn-primary" id="add-task-btn">Agregar Tarea</button>
+              </div>
+            </div>
+
+            <div class="task-columns">
+              <div class="task-col">
+                <h3 class="col-title">Pendientes <span class="col-count" id="pending-count">0</span></h3>
+                <ul class="task-list" id="task-list"></ul>
+              </div>
+              <div class="task-col">
+                <h3 class="col-title">Completadas <span class="col-count" id="done-count">0</span></h3>
+                <ul class="task-list" id="done-list"></ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================== EMAILS SECTION ===================== -->
+        <section class="section" id="section-emails">
+          <div class="section-inner">
+            <div class="card add-card">
+              <div class="card-title-row">
+                <h2 class="card-title">Agregar Correo</h2>
+                <div style="margin-left:auto; display:flex; gap:8px;">
+                  <button class="btn btn-primary" id="compose-email-btn">✉ Redactar Correo</button>
+                </div>
+              </div>
+              <div class="form-row">
+                <input type="text" id="email-sender" class="text-input" placeholder="Nombre del remitente…" />
+                <input type="text" id="email-subject" class="text-input" placeholder="Asunto…" />
+                <select id="email-status" class="select-input">
+                  <option value="waiting">Esperando respuesta</option>
+                  <option value="need-answer">Necesita respuesta</option>
+                  <option value="escalated">Escalado</option>
+                </select>
+                <button class="btn btn-primary" id="add-email-btn">Agregar</button>
+              </div>
+            </div>
+
+            <div class="task-columns">
+              <div class="task-col">
+                <div class="card-title-row email-legend" style="margin-bottom:12px;">
+                  <h3 class="col-title" style="margin:0;">Pendientes <span class="col-count" id="pending-email-count">0</span></h3>
+                  <div style="display:flex; gap:12px; margin-left:auto;">
+                    <span class="legend-item"><span class="dot dot-waiting"></span>Esperando</span>
+                    <span class="legend-item"><span class="dot dot-need-answer"></span>Necesita resp.</span>
+                    <span class="legend-item"><span class="dot dot-escalated"></span>Escalado</span>
+                  </div>
+                </div>
+                <ul class="email-list" id="email-list"></ul>
+              </div>
+              <div class="task-col">
+                <h3 class="col-title">Enviados (Historial) <span class="col-count" id="sent-email-count">0</span></h3>
+                <ul class="email-list" id="sent-email-list"></ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================== POMODORO SECTION ===================== -->
+        <section class="section" id="section-pomodoro">
+          <div class="section-inner pomodoro-layout">
+            <div class="card pomodoro-card">
+              <div class="pomodoro-phase" id="pomodoro-phase">Sesión de Trabajo</div>
+              <div class="pomodoro-session-info" id="pomodoro-session-info">Sesión 1 de 4</div>
+
+              <div class="timer-ring-wrapper">
+                <svg class="timer-ring" viewBox="0 0 200 200">
+                  <circle class="ring-bg" cx="100" cy="100" r="88"/>
+                  <circle class="ring-progress" id="ring-progress" cx="100" cy="100" r="88"/>
+                </svg>
+                <div class="timer-display" id="timer-display">25:00</div>
+              </div>
+
+              <div class="pomodoro-controls">
+                <button class="btn btn-primary" id="pomo-start">▶ Iniciar</button>
+                <button class="btn btn-secondary" id="pomo-pause">⏸ Pausar</button>
+                <button class="btn btn-ghost" id="pomo-reset">↺ Reiniciar</button>
+              </div>
+            </div>
+
+            <div class="card settings-card">
+              <h2 class="card-title">Configuración</h2>
+              <div class="setting-row">
+                <label class="setting-label">Duración de trabajo (min)</label>
+                <input type="number" id="work-duration" class="number-input" value="25" min="1" max="60" />
+              </div>
+              <div class="setting-row">
+                <label class="setting-label">Duración del descanso (min)</label>
+                <input type="number" id="break-duration" class="number-input" value="5" min="1" max="30" />
+              </div>
+              <div class="setting-row">
+                <label class="setting-label">Sesiones por ciclo</label>
+                <input type="number" id="sessions-per-cycle" class="number-input" value="4" min="1" max="8" />
+              </div>
+              <button class="btn btn-secondary" id="apply-settings-btn" style="margin-top: 8px;">Aplicar Configuración</button>
+
+              <div class="sessions-dots" id="sessions-dots"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================== NOTES SECTION ===================== -->
+        <section class="section" id="section-notes">
+          <div class="section-inner notes-layout">
+            <div class="card notes-card">
+              <div class="notes-header">
+                <h2 class="card-title">Notas Rápidas</h2>
+                <span class="autosave-indicator" id="autosave-indicator">Guardado</span>
+              </div>
+              <textarea class="notes-textarea" id="notes-textarea" placeholder="Escribí tus notas aquí…"></textarea>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- ===================== TASK DETAIL MODAL ===================== -->
+  <div class="modal-overlay" id="task-modal-overlay">
+    <div class="modal-card" id="task-modal">
+      <div class="modal-header">
+        <div class="modal-title-row">
+          <span class="priority-dot modal-priority-dot" id="modal-priority-dot"></span>
+          <input type="text" class="modal-title-input" id="modal-title-input" />
+        </div>
+        <button class="btn-icon modal-close" id="modal-close-btn" title="Close">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-left">
+          <!-- Status -->
+          <div class="modal-field">
+            <label class="modal-field-label">Estado</label>
+            <div class="status-chips" id="status-chips">
+              <button class="status-chip" data-status="todo">📋 Pendiente</button>
+              <button class="status-chip" data-status="in-progress">🔄 En Progreso</button>
+              <button class="status-chip" data-status="blocked">🚫 Bloqueado</button>
+              <button class="status-chip" data-status="done">✅ Completado</button>
+            </div>
+          </div>
+
+          <!-- Priority -->
+          <div class="modal-field">
+            <label class="modal-field-label">Prioridad</label>
+            <div class="priority-chips" id="priority-chips">
+              <button class="priority-chip" data-priority="high">🔴 Alta</button>
+              <button class="priority-chip" data-priority="medium">🟡 Media</button>
+              <button class="priority-chip" data-priority="low">🟢 Baja</button>
+            </div>
+          </div>
+
+          <!-- Created at -->
+          <div class="modal-field">
+            <label class="modal-field-label">Creado</label>
+            <span class="modal-meta" id="modal-created-at"></span>
+          </div>
+        </div>
+
+        <div class="modal-right">
+          <!-- Comments -->
+          <div class="modal-field">
+            <label class="modal-field-label">Comentarios <span class="comment-count" id="comment-count"></span></label>
+            <ul class="comment-list" id="comment-list"></ul>
+            <div class="comment-input-row">
+              <textarea class="comment-textarea" id="comment-input" placeholder="Agregar un comentario…" rows="2"></textarea>
+              <button class="btn btn-primary btn-sm" id="add-comment-btn">Agregar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="modal-save-btn">Guardar Cambios</button>
+        <button class="btn btn-ghost" id="modal-close-btn2">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== COMPOSE EMAIL MODAL ===================== -->
+  <div class="modal-overlay" id="compose-modal-overlay">
+    <div class="modal-card compose-modal-card" id="compose-modal">
+      <div class="modal-header">
+        <div class="modal-title-row">
+          <span style="font-size:20px">✉</span>
+          <span style="font-weight:600;font-size:15px;margin-left:8px">New Email — Outlook</span>
+        </div>
+        <button class="btn-icon modal-close" id="compose-close-btn" title="Cerrar">✕</button>
+      </div>
+
+      <div class="modal-body compose-body">
+        <div class="compose-field-row">
+          <label class="compose-label">To</label>
+          <input type="email" id="compose-to" class="text-input" placeholder="recipient@company.com" autocomplete="off" />
+        </div>
+        <div class="compose-field-row">
+          <label class="compose-label">CC</label>
+          <input type="email" id="compose-cc" class="text-input" placeholder="cc@company.com (optional)" autocomplete="off" />
+        </div>
+        <div class="compose-field-row">
+          <label class="compose-label">Subject</label>
+          <input type="text" id="compose-subject" class="text-input" placeholder="Email subject…" />
+        </div>
+        <div class="compose-field-row compose-body-row">
+          <label class="compose-label">Body</label>
+          <textarea id="compose-body" class="notes-textarea compose-textarea" placeholder="Write your email content here…" rows="10"></textarea>
+        </div>
+
+        <div id="compose-status" class="compose-status" style="display:none"></div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-primary" id="compose-send-btn">📤 Send via Outlook</button>
+        <button class="btn btn-ghost" id="compose-close-btn2">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>
