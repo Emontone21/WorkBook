@@ -182,13 +182,26 @@
 
         <!-- ===================== NOTES SECTION ===================== -->
         <section class="section" id="section-notes">
-          <div class="section-inner notes-layout">
-            <div class="card notes-card">
-              <div class="notes-header">
-                <h2 class="card-title">Notas Rápidas</h2>
-                <span class="autosave-indicator" id="autosave-indicator">Guardado</span>
+          <div class="section-inner notes-layout-split">
+            <div class="card notes-sidebar">
+              <div class="notes-header" style="margin-bottom: 20px;">
+                <h2 class="card-title" style="margin:0;">Mis Notas</h2>
+                <button class="btn btn-primary btn-sm" id="new-note-btn" style="padding: 5px 12px;">➕ Nueva</button>
+              </div>
+              <ul class="notes-list" id="notes-list"></ul>
+            </div>
+            <div class="card notes-editor-card" id="notes-editor-container">
+              <div class="notes-header" style="border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 12px;">
+                <input type="text" class="notes-title-input" id="notes-title-input" placeholder="Título de la nota..." />
+                <div style="display:flex; align-items:center; gap: 10px;">
+                  <span class="autosave-indicator" id="autosave-indicator">Guardado ✓</span>
+                  <button class="btn-icon danger" id="delete-note-btn" title="Eliminar Nota">✕</button>
+                </div>
               </div>
               <textarea class="notes-textarea" id="notes-textarea" placeholder="Escribí tus notas aquí…"></textarea>
+            </div>
+            <div class="card notes-editor-card" id="notes-editor-empty" style="display:none; align-items:center; justify-content:center;">
+              <span class="empty-state">Seleccioná una nota o creá una nueva 📝</span>
             </div>
           </div>
         </section>

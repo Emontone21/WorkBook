@@ -690,41 +690,157 @@ document.getElementById('apply-settings-btn').addEventListener('click', () => {
 updateTimerUI();
 
 /* =============================================
-   SECTION 4 — NOTES
+   SECTION 4 — NOTES (Notion-style)
 ============================================= */
-const notesTA = document.getElementById('notes-textarea');
+const notesListEl = document.getElementById('notes-list');
+const noteTitleInput = document.getElementById('notes-title-input');
+const noteBodyInput = document.getElementById('notes-textarea');
+const notesEditorContainer = document.getElementById('notes-editor-container');
+const notesEmptyState = document.getElementById('notes-editor-empty');
 const autosaveIndicator = document.getElementById('autosave-indicator');
+const newNoteBtn = document.getElementById('new-note-btn');
+const deleteNoteBtn = document.getElementById('delete-note-btn');
 
-notesTA.value = load('hf_notes', '');
+let notesArray = load('hf_notes_list', []);
 
+// Migration logic
+let oldSingleNote = localStorage.getItem('hf_notes');
+if (oldSingleNote && notesArray.length === 0) {
+  try {
+    const parsed = JSON.parse(oldSingleNote); 
+    if (typeof parsed === 'string' && parsed.trim() !== '') {
+      notesArray.push({ id: genId(), title: 'Nota migrada', body: parsed, updatedAt: Date.now() });
+    }
+  } catch(e) {
+    if (oldSingleNote.trim() !== '') {
+      notesArray.push({ id: genId(), title: 'Nota migrada', body: oldSingleNote, updatedAt: Date.now() });
+    }
+  }
+  localStorage.removeItem('hf_notes');
+  save('hf_notes_list', notesArray);
+}
+
+let activeNoteId = null;
 let notesDirty = false;
 
-notesTA.addEventListener('input', () => {
+function formatNoteDate(timestamp) {
+  const d = new Date(timestamp);
+  return d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+}
+
+function renderNotesList() {
+  notesListEl.innerHTML = '';
+  notesArray.sort((a,b) => b.updatedAt - a.updatedAt);
+
+  if (notesArray.length === 0) {
+    notesListEl.innerHTML = '<li class="empty-state" style="padding:20px 0;">No tenés notas</li>';
+    return;
+  }
+
+  notesArray.forEach(note => {
+    const li = document.createElement('li');
+    li.className = `note-list-item ${note.id === activeNoteId ? 'active' : ''}`;
+    
+    const title = note.title.trim() || 'Nota sin título';
+    const dateStr = formatNoteDate(note.updatedAt);
+    
+    li.innerHTML = `
+      <div class="note-item-title">${escHtml(title)}</div>
+      <div class="note-item-date">${dateStr}</div>
+    `;
+    
+    li.addEventListener('click', () => {
+      if (notesDirty) saveNotes();
+      openNote(note.id);
+    });
+
+    notesListEl.appendChild(li);
+  });
+}
+
+function openNote(id) {
+  activeNoteId = id;
+  const note = notesArray.find(n => n.id === id);
+  if (!note) {
+    closeNote();
+    return;
+  }
+  
+  noteTitleInput.value = note.title;
+  noteBodyInput.value = note.body;
+  
+  notesEditorContainer.style.display = 'flex';
+  notesEmptyState.style.display = 'none';
+  
+  renderNotesList();
+}
+
+function closeNote() {
+  activeNoteId = null;
+  notesEditorContainer.style.display = 'none';
+  notesEmptyState.style.display = 'flex';
+  renderNotesList();
+}
+
+newNoteBtn.addEventListener('click', () => {
+  if (notesDirty) saveNotes();
+  const id = genId();
+  notesArray.unshift({ id, title: '', body: '', updatedAt: Date.now() });
+  save('hf_notes_list', notesArray);
+  openNote(id);
+  noteTitleInput.focus();
+});
+
+deleteNoteBtn.addEventListener('click', () => {
+  if (!activeNoteId) return;
+  notesArray = notesArray.filter(n => n.id !== activeNoteId);
+  save('hf_notes_list', notesArray);
+  notesDirty = false;
+  closeNote();
+});
+
+function markDirty() {
   notesDirty = true;
   autosaveIndicator.className = 'autosave-indicator saving';
   autosaveIndicator.textContent = 'Sin guardar…';
-});
+}
+
+noteTitleInput.addEventListener('input', markDirty);
+noteBodyInput.addEventListener('input', markDirty);
 
 function saveNotes() {
-  if (notesDirty) {
-    save('hf_notes', notesTA.value);
-    notesDirty = false;
-    autosaveIndicator.className = 'autosave-indicator saved';
-    autosaveIndicator.textContent = 'Guardado ✓';
-    setTimeout(() => {
-      autosaveIndicator.className = 'autosave-indicator';
-      autosaveIndicator.textContent = 'Se guarda cada 10s';
-    }, 2000);
+  if (notesDirty && activeNoteId) {
+    const note = notesArray.find(n => n.id === activeNoteId);
+    if (note) {
+      note.title = noteTitleInput.value;
+      note.body = noteBodyInput.value;
+      note.updatedAt = Date.now();
+      save('hf_notes_list', notesArray);
+      
+      notesDirty = false;
+      autosaveIndicator.className = 'autosave-indicator saved';
+      autosaveIndicator.textContent = 'Guardado ✓';
+      renderNotesList();
+      
+      setTimeout(() => {
+        if (!notesDirty) {
+          autosaveIndicator.className = 'autosave-indicator';
+          autosaveIndicator.textContent = 'Se guarda cada 10s';
+        }
+      }, 2000);
+    }
   }
 }
 
-setInterval(saveNotes, 10000);
+setInterval(() => { if(notesDirty) saveNotes(); }, 5000); // 5 sec autosave check
 window.addEventListener('beforeunload', saveNotes);
 
-autosaveIndicator.textContent = notesTA.value ? 'Cargado desde almacenamiento' : 'Se guarda cada 10s';
-setTimeout(() => {
-  autosaveIndicator.textContent = 'Se guarda cada 10s';
-}, 2000);
+// Init
+if (notesArray.length > 0) {
+  openNote(notesArray[0].id);
+} else {
+  closeNote();
+}
 
 /* =============================================
    COMPOSE EMAIL MODAL — Outlook COM integration
