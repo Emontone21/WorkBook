@@ -14,7 +14,7 @@ Gestor de tareas diarias. Aplicación de escritorio construida con **Electron** 
 
 ```bash
 # Clonar el repositorio
-git clone https://github.com/tu-usuario/workbook.git
+git clone https://github.com/Emontone21/WorkBook
 cd workbook
 
 # Dentro de la carpeta del proyecto
